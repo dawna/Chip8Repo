@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Chip8Emulator
 {
-    class Renderer
+    public class Renderer
     {
+        public void ClearScreen(){
+
+        }
     }
 }

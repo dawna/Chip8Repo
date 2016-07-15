@@ -8,15 +8,15 @@ namespace Chip8Emulator
 {
     public class Chip8Interpreter
     {
-        private readonly Renderer _renderer{ get; set; }
-        private readonly int[] _rom { get;  set; }
-        private readonly ROMType _romType { get;  set; }
+        private Renderer _renderer{ get; set; }
+        private int[] _rom { get;  set; }
+        private ROMType _romType { get;  set; }
 
-        private Chip8DataModel ConfigurationsModel { get; set; }
+        private Chip8ConfigModel ConfigurationsModel { get; set; }
          
-        public Chip8Interpreter(int[] _rom, ROMType romType)
+        public Chip8Interpreter(int[] rom, ROMType romType)
         {
-            this._rom = _rom;
+            this._rom = rom;
             this.InitializeInterpreter(romType);
         }
 
@@ -41,7 +41,7 @@ namespace Chip8Emulator
                 localPC = 0x600;
             }
 
-            this.ConfigurationsModel = new Chip8DataModel
+            this.ConfigurationsModel = new Chip8ConfigModel
             {
                 Stack = new int[0xF],
                 V = new int[0xF],
@@ -57,9 +57,9 @@ namespace Chip8Emulator
             }
         }
 
-        private List<Action<Chip8DataModel>> OpcodeInterpreter()
+        private List<Action<Chip8ConfigModel>> OpcodeInterpreter()
         {
-            var opcodeFunctions = new List<Action<Chip8DataModel>>();
+            var opcodeFunctions = new List<Action<Chip8ConfigModel>>();
 
             foreach (int opcode in this._rom)
             {
@@ -71,20 +71,28 @@ namespace Chip8Emulator
                             switch (opcode & 0x000F)
                             {
                                 case 0x0:
+                                    //00E0
+                                    opcodeFunctions.Add(OpcodeInstructions.ClearScreen);
                                     break;
                                 case 0xE:
+                                    //00EE
+                                    opcodeFunctions.Add(OpcodeInstructions.ReturnFromSubroutine);
                                     break;
                             }
                         }
                         else
                         {
-                            opcodeFunctions.Add(OpcodeInstructions.Jump);
                             //0nnn
+                            opcodeFunctions.Add(OpcodeInstructions.JumpToMachineRoutine);
                         }
                         break;
                     case 0x1:
+                        //1nnn
+                        opcodeFunctions.Add(OpcodeInstructions.JumpToAddress);
                         break;
                     case 0x2:
+                        //3nnn
+                        opcodeFunctions.Add(OpcodeInstructions.CallAddress);
                         break;
                     case 0x3:
                         break;

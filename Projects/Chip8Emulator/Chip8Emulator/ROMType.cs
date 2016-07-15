@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chip8Emulator
 {
-    enum ROMType
+    public enum ROMType
     {
        Normal,
        ETI660

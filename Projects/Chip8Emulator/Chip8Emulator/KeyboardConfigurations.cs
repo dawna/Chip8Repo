@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chip8Emulator
 {
-    class KeyboardConfigurations
+    public class KeyboardConfigurations
     {
     }
 }

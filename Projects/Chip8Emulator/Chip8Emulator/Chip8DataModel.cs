@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chip8Emulator
 {
-    public class Chip8DataModel
+    public class Chip8ConfigModel
     {
         //16 bit registers.
         public int[] V { get; set; }
@@ -22,5 +22,7 @@ namespace Chip8Emulator
         public byte SP { get; set; }
         //Stores 16 16-bit values.
         public int[] Stack { get; set; }
+        //Stores the pixels on screen.
+        public int[][] Pixels { get; set; }
     }
 }
