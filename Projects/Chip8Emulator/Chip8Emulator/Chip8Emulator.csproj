@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chip8DataModel.cs" />
+    <Compile Include="Chip8ConfigModel.cs" />
     <Compile Include="Chip8EmulatorMain.cs" />
     <Compile Include="Chip8Interpreter.cs" />
     <Compile Include="ConstantValues.cs" />

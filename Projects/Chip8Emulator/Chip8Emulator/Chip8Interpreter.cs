@@ -57,73 +57,69 @@ namespace Chip8Emulator
             }
         }
 
-        private List<Action<Chip8ConfigModel>> OpcodeInterpreter()
+        private void OpcodeInterpreter(int opcode)
         {
-            var opcodeFunctions = new List<Action<Chip8ConfigModel>>();
-
-            foreach (int opcode in this._rom)
+            switch ((opcode & 0xF000) >> 0xc)
             {
-                switch ((opcode & 0xF000) >> 0xc)
-                {
-                    case 0x0:
-                        if ((opcode & 0x0F00) == 0)
+                case 0x0:
+                    if ((opcode & 0x0F00) == 0)
+                    {
+                        switch (opcode & 0x000F)
                         {
-                            switch (opcode & 0x000F)
-                            {
-                                case 0x0:
-                                    //00E0
-                                    opcodeFunctions.Add(OpcodeInstructions.ClearScreen);
-                                    break;
-                                case 0xE:
-                                    //00EE
-                                    opcodeFunctions.Add(OpcodeInstructions.ReturnFromSubroutine);
-                                    break;
-                            }
+                            case 0x0:
+                                //00E0
+                                OpcodeInstructions.ClearScreen(this.ConfigurationsModel);
+                                break;
+                            case 0xE:
+                                //00EE
+                                OpcodeInstructions.ReturnFromSubroutine(this.ConfigurationsModel);
+                                break;
                         }
-                        else
-                        {
-                            //0nnn
-                            opcodeFunctions.Add(OpcodeInstructions.JumpToMachineRoutine);
-                        }
-                        break;
-                    case 0x1:
-                        //1nnn
-                        opcodeFunctions.Add(OpcodeInstructions.JumpToAddress);
-                        break;
-                    case 0x2:
-                        //3nnn
-                        opcodeFunctions.Add(OpcodeInstructions.CallAddress);
-                        break;
-                    case 0x3:
-                        break;
-                    case 0x4:
-                        break;
-                    case 0x5:
-                        break;
-                    case 0x6:
-                        break;
-                    case 0x7:
-                        break;
-                    case 0x8:
-                        break;
-                    case 0x9:
-                        break;
-                    case 0xA:
-                        break;
-                    case 0xB:
-                        break;
-                    case 0xC:
-                        break;
-                    case 0xD:
-                        break;
-                    case 0xE:
-                        break;
-                    case 0xF:
-                        break;
-                }
+                    }
+                    else
+                    {
+                        //0nnn
+                        OpcodeInstructions.JumpToMachineRoutine(this.ConfigurationsModel);
+                    }
+                    break;
+                case 0x1:
+                    //1nnn
+                    OpcodeInstructions.JumpToAddress(this.ConfigurationsModel);
+                    break;
+                case 0x2:
+                    //3nnn
+                    OpcodeInstructions.CallAddress(this.ConfigurationsModel);
+                    break;
+                case 0x3:
+                    break;
+                case 0x4:
+                    break;
+                case 0x5:
+                    break;
+                case 0x6:
+                    break;
+                case 0x7:
+                    break;
+                case 0x8:
+                    break;
+                case 0x9:
+                    break;
+                case 0xA:
+                    break;
+                case 0xB:
+                    break;
+                case 0xC:
+                    break;
+                case 0xD:
+                    break;
+                case 0xE:
+                    break;
+                case 0xF:
+                    break;
             }
-
-            return opcodeFunctions;
         }
+
+        return opcodeFunctions;
+    }
     }
 }

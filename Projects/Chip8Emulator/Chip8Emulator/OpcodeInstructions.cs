@@ -8,99 +8,166 @@ namespace Chip8Emulator
 {
     public class OpcodeInstructions
     {
-        public static Action<Chip8ConfigModel> JumpToMachineRoutine = delegate(Chip8ConfigModel data)
+        public static void JumpToMachineRoutine(Chip8ConfigModel config)
         {
             //Do stuff
-        };
+        }
 
-        public static Action<Chip8ConfigModel> ClearScreen = delegate(Chip8ConfigModel data)
+        public static void ClearScreen(Chip8ConfigModel config)
         {
-            //Do stuff
-        };
+            config.Pixels = new int[config.ScreenWidth, config.ScreenHeight]; 
+        }
 
-        public static Action<Chip8ConfigModel> ReturnFromSubroutine = delegate(Chip8ConfigModel data)
+        public static void ReturnFromSubroutine(Chip8ConfigModel config)
         {
-            //Do stuff
-        };
+            config.PC = config.Stack[config.SP];
+            config.SP--;
+        }
 
-        public static Action<Chip8ConfigModel> JumpToAddress = delegate(Chip8ConfigModel data)
+        public static void JumpToAddress(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var addr = instruction & 0x0FFF;
+            config.PC = addr;
+        }
 
-        public static Action<Chip8ConfigModel> CallAddress = delegate(Chip8ConfigModel data)
+        public static void CallAddress(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var addr = instruction & 0x0FFF;
+            config.SP++;
+            config.PC = config.Stack[config.SP];
+        }
 
-        public static Action<Chip8ConfigModel> SkipNextInstruction3xkk = delegate(Chip8ConfigModel data)
+        public static void SkipNextInstruction3xkk(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var kk = instruction & 0x00FF;
+            var x = (instruction & 0x0F00) >> 8;
+            var vX = config.V[x];
 
-        public static Action<Chip8ConfigModel> SkipNextInstruction4xkk = delegate(Chip8ConfigModel data)
-        {
-            //Do stuff
-        };
+            if (vX == kk)
+            {
+                config.PC += 2;
+            }
+        }
 
-        public static Action<Chip8ConfigModel> Load6xkk = delegate(Chip8ConfigModel data)
+        public static void SkipNextInstruction4xkk(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var kk = instruction & 0x00FF;
+            var x = (instruction & 0x0F00) >> 8;
+            var vX = config.V[x];
 
-        public static Action<Chip8ConfigModel> Add7xkk = delegate(Chip8ConfigModel data)
-        {
-            //Do stuff
-        };
+            if (vX != kk)
+            {
+                config.PC += 2;
+            }
+        }
 
-        public static Action<Chip8ConfigModel> Load8xy0 = delegate(Chip8ConfigModel data)
+        public static void SkipNextInstruction5xy0(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+            var vX = config.V[x];
+            var vY = config.V[y];
 
-        public static Action<Chip8ConfigModel> Or = delegate(Chip8ConfigModel data)
+            if (vX == vY)
+            {
+                config.PC += 2;
+            }
+        }
+        public static void Load6xkk(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var kk = instruction & 0x00FF;
+            var x = (instruction & 0x0F00) >> 8;
 
-        public static Action<Chip8ConfigModel> And = delegate(Chip8ConfigModel data)
-        {
-            //Do stuff
-        };
+            config.V[x] = kk;
+        }
 
-        public static Action<Chip8ConfigModel> XOR = delegate(Chip8ConfigModel data)
+        public static void Add7xkk(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var kk = instruction & 0x00FF;
+            var x = (instruction & 0x0F00) >> 8;
 
-        public static Action<Chip8ConfigModel> Add8xy4 = delegate(Chip8ConfigModel data)
-        {
-            //Do stuff
-        };
+            config.V[x] += kk;
+        }
 
-        public static Action<Chip8ConfigModel> Subtract = delegate(Chip8ConfigModel data)
+        public static void Load8xy0(Chip8ConfigModel config, int instruction)
         {
-            //Do stuff
-        };
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+
+            config.V[x] = config.V[y];
+        }
+
+        public static void Or(Chip8ConfigModel config, int instruction)
+        {
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+
+            config.V[x] |= config.V[y];
+        }
+
+        public static void And(Chip8ConfigModel config, int instruction)
+        {
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+
+            config.V[x] &= config.V[y];
+        }
+
+        public static void XOR(Chip8ConfigModel config, int instruction)
+        {
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+
+            config.V[x] ^= config.V[y];
+        }
+
+        public static void Add8xy4(Chip8ConfigModel config, int instruction)
+        {
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+            var vX = config.V[x];
+            var vY = config.V[y];
+
+            var result = vX + vY;
+
+            //0xFF.
+            if (result > 255)
+            {
+                result = result & 0xFF;
+                config.V[0xF] = 1;
+            }
+            else
+            {
+                config.V[0xF] = 0;
+            }
+
+            config.V[x] = result;
+        }
+
+        public static void Subtract(Chip8ConfigModel config, int instruction)
+        {
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+        }
         
-        public static Action<Chip8ConfigModel> ShiftRight = delegate(Chip8ConfigModel data)
+        public static void ShiftRight(Chip8ConfigModel config)
         {
             //Do stuff
-        };
+        }
 
-        public static Action<Chip8ConfigModel> SubtractNoBorrow = delegate(Chip8ConfigModel data)
+        public static void SubtractNoBorrow(Chip8ConfigModel config)
         {
             //Do stuff
-        };
+        }
 
-        public static Action<Chip8ConfigModel> ShiftLeft = delegate(Chip8ConfigModel data)
+        public static void ShiftLeft(Chip8ConfigModel config)
         {
             //Do stuff
-        };
+        }
 
-        public static Action<Chip8ConfigModel> SkipNextInstruction9xy0 = delegate(Chip8ConfigModel data)
+        public static void SkipNextInstruction9xy0(Chip8ConfigModel config)
         {
             //Do stuff
-        };
+        }
     }
 }

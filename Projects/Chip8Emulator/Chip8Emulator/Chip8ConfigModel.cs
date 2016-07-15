@@ -23,6 +23,10 @@ namespace Chip8Emulator
         //Stores 16 16-bit values.
         public int[] Stack { get; set; }
         //Stores the pixels on screen.
-        public int[][] Pixels { get; set; }
+        public int[,] Pixels { get; set; }
+        //Stores the width of the screen.
+        public int ScreenWidth { get; set; }
+        //Stores the height of the screen.
+        public int ScreenHeight { get; set; }
     }
 }
