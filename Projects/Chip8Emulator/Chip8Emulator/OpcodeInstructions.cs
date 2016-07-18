@@ -252,7 +252,7 @@ namespace Chip8Emulator
             }
         }
 
-        public static void DelayTimer(Chip8ConfigModel config, int instruction)
+        public static void DelayTimerFx07(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
             config.V[x] = (uint)config.DT;
@@ -281,10 +281,9 @@ namespace Chip8Emulator
             }
         }
 
-        public static void SetDelayTimer(Chip8ConfigModel config, int instruction)
+        public static void SetDelayTimerFx15(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
-
             config.DT = (int)config.V[x];
         }
 

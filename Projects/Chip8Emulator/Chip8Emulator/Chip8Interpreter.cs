@@ -50,13 +50,12 @@ namespace Chip8Emulator
             };
         }
 
-        public void InterpretationLoop()
+        public bool PopInstruction()
         {
-            while (true)
-            {
-                var opcode = (this._rom[ConfigurationsModel.PC] << 8) | this._rom[ConfigurationsModel.PC + 1];
-                OpcodeInterpreter(opcode);
-            }
+            var opcode = (this._rom[ConfigurationsModel.PC] << 8) | this._rom[ConfigurationsModel.PC + 1];
+            OpcodeInterpreter(opcode);
+
+            return (opcode != 0);
         }
 
         private void OpcodeInterpreter(int opcode)
@@ -93,30 +92,114 @@ namespace Chip8Emulator
                     OpcodeInstructions.CallAddress(this.ConfigurationsModel, opcode);
                     break;
                 case 0x3:
+                    OpcodeInstructions.SkipNextInstruction3xkk(this.ConfigurationsModel, opcode);
                     break;
                 case 0x4:
+                    OpcodeInstructions.SkipNextInstruction4xkk(this.ConfigurationsModel, opcode);
                     break;
                 case 0x5:
+                    OpcodeInstructions.SkipNextInstruction5xy0(this.ConfigurationsModel, opcode);
                     break;
                 case 0x6:
+                    OpcodeInstructions.Load6xkk(this.ConfigurationsModel, opcode);
                     break;
                 case 0x7:
+                    OpcodeInstructions.Add7xkk(this.ConfigurationsModel, opcode);
                     break;
                 case 0x8:
+                    var rightMostBit = 0xF & opcode;
+                    switch (rightMostBit)
+                    {
+                        case 0: 
+                            OpcodeInstructions.Load8xy0(this.ConfigurationsModel, opcode);
+                            break;
+                        case 1:
+                            OpcodeInstructions.Or(this.ConfigurationsModel, opcode);
+                            break;
+                        case 2:
+                            OpcodeInstructions.And(this.ConfigurationsModel, opcode);
+                            break;
+                        case 3:
+                            OpcodeInstructions.XOR(this.ConfigurationsModel, opcode);
+                            break;
+                        case 4:
+                            OpcodeInstructions.Add8xy4(this.ConfigurationsModel, opcode);
+                            break;
+                        case 5:
+                            OpcodeInstructions.Subtract(this.ConfigurationsModel, opcode);
+                            break;
+                        case 6:
+                            OpcodeInstructions.ShiftRight(this.ConfigurationsModel, opcode);
+                            break;
+                        case 7:
+                            OpcodeInstructions.SubtractNoBorrow(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0xE:
+                            OpcodeInstructions.ShiftLeft(this.ConfigurationsModel, opcode);
+                            break;
+                    }
                     break;
                 case 0x9:
+                    OpcodeInstructions.SkipNextInstruction9xy0(this.ConfigurationsModel, opcode);
                     break;
                 case 0xA:
+                    OpcodeInstructions.LoadAnnn(this.ConfigurationsModel, opcode);
                     break;
                 case 0xB:
+                    OpcodeInstructions.JumpBnnn(this.ConfigurationsModel, opcode);
                     break;
                 case 0xC:
+                    OpcodeInstructions.Random(this.ConfigurationsModel, opcode);
                     break;
                 case 0xD:
+                    OpcodeInstructions.Draw(this.ConfigurationsModel, opcode);
                     break;
                 case 0xE:
+                    var lastTwoDigits = 0xFF & opcode;
+
+                    if (lastTwoDigits == 0x9E)
+                    {
+                        OpcodeInstructions.SkipNextInstructionKeyPressed(this.ConfigurationsModel, opcode);
+                    }
+                    else if (lastTwoDigits == 0xA1)
+                    {
+                        OpcodeInstructions.SkipNextInstructionKeyNotPressed(this.ConfigurationsModel, opcode);
+                    }
+
                     break;
                 case 0xF:
+                    var digits = 0xFF & opcode;
+
+                    switch(digits)
+                    {
+                        case 0x07:
+                            OpcodeInstructions.DelayTimerFx07(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x0A:
+                            OpcodeInstructions.WaitForKeyPress(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x15:
+                            OpcodeInstructions.SetDelayTimerFx15(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x18:
+                            OpcodeInstructions.SetSoundTimer(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x1E:
+                            OpcodeInstructions.AddFx1E(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x29:
+                            OpcodeInstructions.LoadFx29(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x33:
+                            OpcodeInstructions.LoadFx33(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x55:
+                            OpcodeInstructions.LoadFx55(this.ConfigurationsModel, opcode);
+                            break;
+                        case 0x65:
+                            OpcodeInstructions.LoadFx65(this.ConfigurationsModel, opcode);
+                            break;
+                    }
                     break;
             }
 

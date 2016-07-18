@@ -25,7 +25,8 @@ namespace Chip8Emulator
                     //Throw exception.
                 }
 
-                int counter = 0;
+                //Should begin on the 25th byte.
+                int counter = 0x200 / 0x8;
                 for (int i = 0; i < byteArray.Length; i ++)
                 {
                     romData[counter] = byteArray[i];
@@ -37,6 +38,125 @@ namespace Chip8Emulator
             }
 
             return romData;
+        }
+
+        public static void LoadSpritesIntoRom(int[] rom)
+        {
+            var spriteArray = new int[][]
+            {
+                new int[]
+                {
+                    0xF0,
+                    0x90,
+                    0x90,
+                    0x90,
+                    0xF0
+                },
+                new int[]
+                {
+                    0x20,
+                    0x60,
+                    0x20,
+                    0x20,
+                    0x70
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x10,
+                    0xF0,
+                    0x80,
+                    0xF0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x10,
+                    0xF0,
+                    0x10,
+                    0xF0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x80,
+                    0xF0,
+                    0x90,
+                    0xF0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x10,
+                    0x20,
+                    0x40,
+                    0x40
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x90,
+                    0xF0,
+                    0x90,
+                    0xF0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x90,
+                    0xF0,
+                    0x10,
+                    0xF0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x90,
+                    0xF0,
+                    0x90,
+                    0x90
+                },
+                new int[]
+                {
+                    0xE0,
+                    0x90,
+                    0xE0,
+                    0x90,
+                    0xE0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x80,
+                    0x80,
+                    0x80,
+                    0xF0
+                },
+                new int[]
+                {
+                    0xE0,
+                    0x90,
+                    0x90,
+                    0x90,
+                    0xE0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x80,
+                    0xF0,
+                    0x80,
+                    0xF0
+                },
+                new int[]
+                {
+                    0xF0,
+                    0x80,
+                    0xF0,
+                    0x80,
+                    0x80
+                },
+            };
         }
 
         static void Main(string[] args)
