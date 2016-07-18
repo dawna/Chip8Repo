@@ -43,8 +43,9 @@ namespace Chip8Emulator
 
             this.ConfigurationsModel = new Chip8ConfigModel
             {
+                Rom = this._rom,
                 Stack = new int[0xF],
-                V = new int[0xF],
+                V = new uint[0xF],
                 PC = localPC
             };
         }
@@ -53,7 +54,8 @@ namespace Chip8Emulator
         {
             while (true)
             {
-
+                var opcode = (this._rom[ConfigurationsModel.PC] << 8) | this._rom[ConfigurationsModel.PC + 1];
+                OpcodeInterpreter(opcode);
             }
         }
 
@@ -84,11 +86,11 @@ namespace Chip8Emulator
                     break;
                 case 0x1:
                     //1nnn
-                    OpcodeInstructions.JumpToAddress(this.ConfigurationsModel);
+                    OpcodeInstructions.JumpToAddress(this.ConfigurationsModel, opcode);
                     break;
                 case 0x2:
                     //3nnn
-                    OpcodeInstructions.CallAddress(this.ConfigurationsModel);
+                    OpcodeInstructions.CallAddress(this.ConfigurationsModel, opcode);
                     break;
                 case 0x3:
                     break;
@@ -117,9 +119,8 @@ namespace Chip8Emulator
                 case 0xF:
                     break;
             }
-        }
 
-        return opcodeFunctions;
-    }
+            this.ConfigurationsModel.PC+=2;
+        }
     }
 }

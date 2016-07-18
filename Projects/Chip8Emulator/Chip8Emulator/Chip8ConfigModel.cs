@@ -9,7 +9,7 @@ namespace Chip8Emulator
     public class Chip8ConfigModel
     {
         //16 bit registers.
-        public int[] V { get; set; }
+        public uint[] V { get; set; }
         //32 bit register (usually stores memory addresses).
         public int I { get; set; }
         //? bit register (Delay Timer).
@@ -28,5 +28,11 @@ namespace Chip8Emulator
         public int ScreenWidth { get; set; }
         //Stores the height of the screen.
         public int ScreenHeight { get; set; }
+        //Stores the keys that have been pressed.
+        public bool[] KeyPresses { get; set; }
+        //Bool that for key press.
+        public bool KeyPressed { get; set; }
+        //Stores the rom.
+        public int[] Rom { get; set; }
     }
 }
