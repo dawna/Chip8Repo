@@ -36,7 +36,8 @@ namespace Chip8Emulator
         {
             var addr = instruction & 0x0FFF;
             config.SP++;
-            config.PC = config.Stack[config.SP];
+            config.Stack[config.SP] = config.PC;
+            config.PC = addr;
         }
 
         public static void SkipNextInstruction3xkk(Chip8ConfigModel config, int instruction)
@@ -229,7 +230,35 @@ namespace Chip8Emulator
 
         public static void Draw(Chip8ConfigModel config, int instruction)
         {
-            //TODO.
+            var n = 0xF & instruction;
+            var x = (instruction & 0x0F00) >> 8;
+            var y = (instruction & 0x00F0) >> 4;
+            var rom = config.Rom;
+            var I = config.I;
+
+            var vX = config.V[x];
+            var vY = config.V[y];
+
+            for (int i = I; i < I + n; i++)
+            {
+                var place = 0;
+                if (vX + i > config.ScreenWidth)
+                {
+                    var xPlace = config.ScreenWidth - (vX + i);
+                }
+                else
+                {
+                    var xPlace = vX + i;
+                }
+
+                var before = config.Pixels[place, vY];
+                config.Pixels[place, vY] ^= rom[i];
+
+                if (before == 1 && config.Pixels[place,vY] == 0)
+                {
+                    config.V[0xF] = 1;
+                }
+            }
         }
 
         public static void SkipNextInstructionKeyPressed(Chip8ConfigModel config, int instruction)
@@ -298,24 +327,40 @@ namespace Chip8Emulator
         {
             var x = (instruction & 0x0F00) >> 8;
 
-            config.I += (int)config.V[x];
+            config.I += (int)config.V[x]; //Carry?
         }
 
         public static void LoadFx29(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
 
-            //TODO.
+            config.I = (int)config.V[x] * 5;
         }
 
         public static void LoadFx33(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
+            var vX = (int)config.V[x];
+
+            var hundreds = (vX % 1000) / 100;
+            var tens = (vX % 100) / 10;
+            var ones = (vX % 10);
+
+            config.Rom[config.I] = hundreds;
+            config.Rom[config.I + 1] = tens;
+            config.Rom[config.I + 2] = ones;
         }
 
         public static void LoadFx55(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
+            var rom = config.Rom;
+            var I = config.I; 
+
+            for (int i = 0; i <= 0xF; i++)
+            {
+                rom[I + i] = (int)config.V[i];
+            }
         }
 
         public static void LoadFx65(Chip8ConfigModel config, int instruction)

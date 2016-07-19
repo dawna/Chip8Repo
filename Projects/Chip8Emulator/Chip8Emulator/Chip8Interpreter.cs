@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFML.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,15 +15,22 @@ namespace Chip8Emulator
 
         private Chip8ConfigModel ConfigurationsModel { get; set; }
          
-        public Chip8Interpreter(int[] rom, ROMType romType)
+        public Chip8Interpreter(int[] rom, ROMType romType, Renderer renderer)
         {
             this._rom = rom;
             this.InitializeInterpreter(romType);
+            this._renderer = renderer;
         }
 
-        public Chip8Interpreter(ROMType romType)
+        public Chip8Interpreter(ROMType romType, Renderer renderer)
         {
             this.InitializeInterpreter(romType);
+            this._renderer = renderer;
+        }
+
+        public void UpdateScreen(RenderWindow window)
+        {
+            this._renderer.DrawToScreen(this.ConfigurationsModel, window);
         }
 
         public void Reset()
@@ -35,23 +43,30 @@ namespace Chip8Emulator
             this._romType = romType;
 
             //Default starting value for PC
-            var localPC = 0x200;
+            var localPC = 0x200 / 8;
             if (this._romType == ROMType.ETI660)
             {
-                localPC = 0x600;
+                localPC = 0x600 / 8;
             }
 
             this.ConfigurationsModel = new Chip8ConfigModel
             {
                 Rom = this._rom,
-                Stack = new int[0xF],
-                V = new uint[0xF],
-                PC = localPC
+                Stack = new int[0xF + 1],
+                V = new uint[0xF + 1],
+                PC = localPC,
+                Pixels = new int[64,32],
+                KeyPresses = new bool[0xF + 1],
+                ScreenWidth = 64,
+                ScreenHeight = 32
             };
         }
 
         public bool PopInstruction()
         {
+            if (ConfigurationsModel.PC >= this._rom.Length || ConfigurationsModel.PC + 1 >= this._rom.Length)
+                return false;
+
             var opcode = (this._rom[ConfigurationsModel.PC] << 8) | this._rom[ConfigurationsModel.PC + 1];
             OpcodeInterpreter(opcode);
 
@@ -88,7 +103,7 @@ namespace Chip8Emulator
                     OpcodeInstructions.JumpToAddress(this.ConfigurationsModel, opcode);
                     break;
                 case 0x2:
-                    //3nnn
+                    //2nnn
                     OpcodeInstructions.CallAddress(this.ConfigurationsModel, opcode);
                     break;
                 case 0x3:

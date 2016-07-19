@@ -26,7 +26,7 @@ namespace Chip8Emulator
                 }
 
                 //Should begin on the 25th byte.
-                int counter = 0x200 / 0x8;
+                int counter = 0x200;
                 for (int i = 0; i < byteArray.Length; i ++)
                 {
                     romData[counter] = byteArray[i];
@@ -42,131 +42,30 @@ namespace Chip8Emulator
 
         public static void LoadSpritesIntoRom(int[] rom)
         {
-            var spriteArray = new int[][]
+            var sprites = ConstantValues.SPRITE_ARRAY;
+
+            var counter = 0;
+            for (int i = 0; i <= 0xF; i++)
             {
-                new int[]
+                for (int j = 0; j < 5; j++)
                 {
-                    0xF0,
-                    0x90,
-                    0x90,
-                    0x90,
-                    0xF0
-                },
-                new int[]
-                {
-                    0x20,
-                    0x60,
-                    0x20,
-                    0x20,
-                    0x70
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x10,
-                    0xF0,
-                    0x80,
-                    0xF0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x10,
-                    0xF0,
-                    0x10,
-                    0xF0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x80,
-                    0xF0,
-                    0x90,
-                    0xF0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x10,
-                    0x20,
-                    0x40,
-                    0x40
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x90,
-                    0xF0,
-                    0x90,
-                    0xF0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x90,
-                    0xF0,
-                    0x10,
-                    0xF0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x90,
-                    0xF0,
-                    0x90,
-                    0x90
-                },
-                new int[]
-                {
-                    0xE0,
-                    0x90,
-                    0xE0,
-                    0x90,
-                    0xE0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x80,
-                    0x80,
-                    0x80,
-                    0xF0
-                },
-                new int[]
-                {
-                    0xE0,
-                    0x90,
-                    0x90,
-                    0x90,
-                    0xE0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x80,
-                    0xF0,
-                    0x80,
-                    0xF0
-                },
-                new int[]
-                {
-                    0xF0,
-                    0x80,
-                    0xF0,
-                    0x80,
-                    0x80
-                },
-            };
+                    rom[counter] = sprites[i][j];
+                    counter++;
+                }
+            }
         }
 
         static void Main(string[] args)
         {
-            string filePath = @"C:\Users\AdamD\Source\Repos\Chip8Repo\Projects\Chip8Emulator\Chip8Emulator\c8games\VERS";
+            string filePath = @"C:\Users\AdamD\Source\Repos\Chip8Repo\Projects\Chip8Emulator\Chip8Emulator\Chip-8 Pack\Chip-8 Games\Blinky [Hans Christian Egeberg, 1991].ch8";
 
             //Retrieves ROM and stores it.
             int[] rom = ReadRomFromFile(filePath);
+            LoadSpritesIntoRom(rom);
             
-            Chip8Interpreter interpreter = new Chip8Interpreter(rom, ROMType.Normal);
+            Renderer renderer = new Renderer();
+
+            Chip8Interpreter interpreter = new Chip8Interpreter(rom, ROMType.Normal, renderer);
             RenderWindow window = new RenderWindow(new VideoMode(800,600), "TEST WINDOW");
 
             Color windowColor = Color.Black;
@@ -177,8 +76,13 @@ namespace Chip8Emulator
             while (window.IsOpen())
             {
                 window.DispatchEvents();
-                window.Clear(windowColor);
+
+                interpreter.UpdateScreen(window);
                 window.Display();
+
+                interpreter.PopInstruction();
+
+                window.Clear(windowColor);
             }
         }
 
