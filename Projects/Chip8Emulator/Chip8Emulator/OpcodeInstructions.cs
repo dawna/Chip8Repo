@@ -17,19 +17,23 @@ namespace Chip8Emulator
 
         public static void ClearScreen(Chip8ConfigModel config)
         {
-            config.Pixels = new int[config.ScreenWidth, config.ScreenHeight]; 
+            config.Pixels = new int[config.ScreenWidth + 1, config.ScreenHeight + 1]; 
         }
 
         public static void ReturnFromSubroutine(Chip8ConfigModel config)
         {
             config.PC = config.Stack[config.SP];
             config.SP--;
+
+            config.PC -= 2;
         }
 
         public static void JumpToAddress(Chip8ConfigModel config, int instruction)
         {
             var addr = instruction & 0x0FFF;
             config.PC = addr;
+
+            config.PC -= 2;
         }
 
         public static void CallAddress(Chip8ConfigModel config, int instruction)
@@ -38,6 +42,8 @@ namespace Chip8Emulator
             config.SP++;
             config.Stack[config.SP] = config.PC;
             config.PC = addr;
+
+            config.PC -= 2;
         }
 
         public static void SkipNextInstruction3xkk(Chip8ConfigModel config, int instruction)
@@ -81,7 +87,7 @@ namespace Chip8Emulator
             var kk = instruction & 0x00FF;
             var x = (instruction & 0x0F00) >> 8;
 
-            config.V[x] = (uint)kk;
+            config.V[x] = (byte)kk;
         }
 
         public static void Add7xkk(Chip8ConfigModel config, int instruction)
@@ -89,7 +95,7 @@ namespace Chip8Emulator
             var kk = instruction & 0x00FF;
             var x = (instruction & 0x0F00) >> 8;
 
-            config.V[x] += (uint)kk;
+            config.V[x] += (byte)kk;
         }
 
         public static void Load8xy0(Chip8ConfigModel config, int instruction)
@@ -144,7 +150,7 @@ namespace Chip8Emulator
                 config.V[0xF] = 0;
             }
 
-            config.V[x] = result;
+            config.V[x] = (byte)result;
         }
 
         public static void Subtract(Chip8ConfigModel config, int instruction)
@@ -154,10 +160,10 @@ namespace Chip8Emulator
             var vX = config.V[x];
             var vY = config.V[y];
 
-            config.V[0xF] = (vX > vY)? 1U : 0U;
+            config.V[0xF] = (byte)((vX > vY)? 1 : 0);
 
             //This may not be right.
-            config.V[x] = vX - vY;
+            config.V[x] = (byte)(vX - vY);
         }
         
         //This may not be right.
@@ -166,8 +172,8 @@ namespace Chip8Emulator
             var x = (instruction & 0x0F00) >> 8;
             var vX = config.V[x];
 
-            config.V[0xF] = (config.V[0xF] == 1)? 1 : vX % 2;
-            config.V[x] = vX / 2;
+            config.V[0xF] = (byte)((vX % 2 != 0)? 1 : 0);
+            config.V[x] = (byte)(vX / 2);
         }
 
         public static void SubtractNoBorrow(Chip8ConfigModel config, int instruction)
@@ -177,20 +183,20 @@ namespace Chip8Emulator
             var vX = config.V[x];
             var vY = config.V[y];
 
-            config.V[0xF] = (vY > vX)? 1U : 0U;
+            config.V[0xF] = (byte)((vY > vX)? 1 : 0);
 
             //This may not be right.
-            config.V[x] = vY - vX;
+            config.V[x] = (byte)(vY - vX);
         }
 
         public static void ShiftLeft(Chip8ConfigModel config, int instruction)
         {
-            var x = (instruction & 0x0F00) >> 8;
-            var vX = config.V[x];
+            byte x = (byte)((instruction & 0x0F00) >> 8);
+            byte vX = config.V[x];
 
             //vX >= 128.
-            config.V[0xF] = (vX >= 0x80)? 1U : 0U;
-            config.V[x] = vX * 2;
+            config.V[0xF] = (byte)((vX >= 0x80)? 1 : 0);
+            config.V[x] = (byte)(vX * 2);
         }
 
         public static void SkipNextInstruction9xy0(Chip8ConfigModel config, int instruction)
@@ -215,7 +221,9 @@ namespace Chip8Emulator
         public static void JumpBnnn(Chip8ConfigModel config, int instruction)
         {
             var nnn = instruction & 0x0FFF;
-            config.PC = (int)config.V[0] + nnn;
+            config.PC = config.V[0] + nnn;
+
+            config.PC -= 2;
         }
 
         public static void Random(Chip8ConfigModel config, int instruction)
@@ -225,7 +233,7 @@ namespace Chip8Emulator
 
             var num = OpcodeInstructions._ran.Next(0, 255);
 
-            config.V[x] = (uint)(num & kk);
+            config.V[x] = (byte)(num & kk);
         }
 
         public static void Draw(Chip8ConfigModel config, int instruction)
@@ -239,26 +247,37 @@ namespace Chip8Emulator
             var vX = config.V[x];
             var vY = config.V[y];
 
+            var counter = 0;
             for (int i = I; i < I + n; i++)
             {
-                var place = 0;
-                if (vX + i > config.ScreenWidth)
+                for (int j = 1; j <= 8; j++)
                 {
-                    var xPlace = config.ScreenWidth - (vX + i);
-                }
-                else
-                {
-                    var xPlace = vX + i;
+                    var place = 0;
+                    if (vX + j > config.ScreenWidth)
+                    {
+                        place = (vX + j) - config.ScreenWidth;
+                    }
+                    else
+                    {
+                        place = vX + j;
+                    }
+
+                    var before = config.Pixels[place, vY + counter];
+                    config.Pixels[place, vY + counter] ^= (GetNthBit(rom[i], 9 - j));
+
+                    if (before == 1 && config.Pixels[place,vY + counter] == 0)
+                    {
+                        config.V[0xF] = 1;
+                    }
                 }
 
-                var before = config.Pixels[place, vY];
-                config.Pixels[place, vY] ^= rom[i];
-
-                if (before == 1 && config.Pixels[place,vY] == 0)
-                {
-                    config.V[0xF] = 1;
-                }
+                counter++;
             }
+        }
+
+        public static int GetNthBit(int b, int j)
+        {
+            return ((b & (1 << j - 1)) != 0)? 1: 0;
         }
 
         public static void SkipNextInstructionKeyPressed(Chip8ConfigModel config, int instruction)
@@ -284,7 +303,7 @@ namespace Chip8Emulator
         public static void DelayTimerFx07(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
-            config.V[x] = (uint)config.DT;
+            config.V[x] = (byte)config.DT;
         }
 
         public static void WaitForKeyPress(Chip8ConfigModel config, int instruction)
@@ -302,7 +321,7 @@ namespace Chip8Emulator
                         break;
                     }
                 }
-                config.V[x] = (uint)key;
+                config.V[x] = (byte)key;
             }
             else
             {
@@ -371,7 +390,7 @@ namespace Chip8Emulator
             
             for (int i = 0; i <= x; i++)
             {
-                config.V[i] = (uint)rom[I + i];
+                config.V[i] = (byte)rom[I + i];
             }
         }
     }

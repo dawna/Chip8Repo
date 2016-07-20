@@ -11,9 +11,9 @@ namespace Chip8Emulator
     {
         public void DrawToScreen(Chip8ConfigModel model, RenderWindow window)
         {
-            for (var y = 0; y < model.ScreenHeight; y++)
+            for (var y = 0; y <= model.ScreenHeight; y++)
             {
-                for (var x = 0; x < model.ScreenWidth; x++)
+                for (var x = 0; x <= model.ScreenWidth; x++)
                 {
                     if (model.Pixels[x, y] == 1)
                     {

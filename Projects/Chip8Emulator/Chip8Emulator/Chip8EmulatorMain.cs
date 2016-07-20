@@ -57,7 +57,7 @@ namespace Chip8Emulator
 
         static void Main(string[] args)
         {
-            string filePath = @"C:\Users\AdamD\Source\Repos\Chip8Repo\Projects\Chip8Emulator\Chip8Emulator\Chip-8 Pack\Chip-8 Games\Blinky [Hans Christian Egeberg, 1991].ch8";
+            string filePath = @"C:\Users\AdamD\Source\Repos\Chip8Repo\Projects\Chip8Emulator\Chip8Emulator\Chip-8 Pack\Chip-8 Games\Breakout (Brix hack) [David Winter, 1997].ch8";
 
             //Retrieves ROM and stores it.
             int[] rom = ReadRomFromFile(filePath);

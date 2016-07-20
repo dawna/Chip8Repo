@@ -9,7 +9,7 @@ namespace Chip8Emulator
     public class Chip8ConfigModel
     {
         //16 bit registers.
-        public uint[] V { get; set; }
+        public byte[] V { get; set; }
         //32 bit register (usually stores memory addresses).
         public int I { get; set; }
         //? bit register (Delay Timer).

@@ -43,7 +43,7 @@ namespace Chip8Emulator
             this._romType = romType;
 
             //Default starting value for PC
-            var localPC = 0x200 / 8;
+            var localPC = 0x200;
             if (this._romType == ROMType.ETI660)
             {
                 localPC = 0x600 / 8;
@@ -53,9 +53,9 @@ namespace Chip8Emulator
             {
                 Rom = this._rom,
                 Stack = new int[0xF + 1],
-                V = new uint[0xF + 1],
+                V = new byte[0xF + 1],
                 PC = localPC,
-                Pixels = new int[64,32],
+                Pixels = new int[65,33],
                 KeyPresses = new bool[0xF + 1],
                 ScreenWidth = 64,
                 ScreenHeight = 32
