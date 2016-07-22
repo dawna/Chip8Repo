@@ -57,6 +57,7 @@
     <Compile Include="Chip8Interpreter.cs" />
     <Compile Include="ConstantValues.cs" />
     <Compile Include="KeyboardConfigurations.cs" />
+    <Compile Include="KeyboardValues.cs" />
     <Compile Include="OpcodeInstructions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderer.cs" />

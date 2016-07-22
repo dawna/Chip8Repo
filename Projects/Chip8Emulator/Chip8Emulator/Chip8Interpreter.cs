@@ -10,22 +10,26 @@ namespace Chip8Emulator
     public class Chip8Interpreter
     {
         private Renderer _renderer{ get; set; }
+        private KeyboardConfigurations _keyboardConfig { get; set; }
+
         private int[] _rom { get;  set; }
         private ROMType _romType { get;  set; }
 
         private Chip8ConfigModel ConfigurationsModel { get; set; }
          
-        public Chip8Interpreter(int[] rom, ROMType romType, Renderer renderer)
+        public Chip8Interpreter(int[] rom, ROMType romType, Renderer renderer, KeyboardConfigurations keyboardConfig)
         {
             this._rom = rom;
-            this.InitializeInterpreter(romType);
             this._renderer = renderer;
+            this._keyboardConfig = keyboardConfig;
+            this.InitializeInterpreter(romType);
         }
 
-        public Chip8Interpreter(ROMType romType, Renderer renderer)
+        public Chip8Interpreter(ROMType romType, Renderer renderer, KeyboardConfigurations keyboardConfig)
         {
-            this.InitializeInterpreter(romType);
             this._renderer = renderer;
+            this._keyboardConfig = keyboardConfig;
+            this.InitializeInterpreter(romType);
         }
 
         public void UpdateScreen(RenderWindow window)
@@ -56,7 +60,7 @@ namespace Chip8Emulator
                 V = new byte[0xF + 1],
                 PC = localPC,
                 Pixels = new int[65,33],
-                KeyPresses = new bool[0xF + 1],
+                KeyModel = this._keyboardConfig.KeyModel,
                 ScreenWidth = 64,
                 ScreenHeight = 32
             };
@@ -216,6 +220,15 @@ namespace Chip8Emulator
                             break;
                     }
                     break;
+            }
+
+            if (this.ConfigurationsModel.DT > 0)
+            {
+                this.ConfigurationsModel.DT--;
+            }
+            if (this.ConfigurationsModel.ST > 0)
+            {
+                this.ConfigurationsModel.ST--;
             }
 
             this.ConfigurationsModel.PC+=2;

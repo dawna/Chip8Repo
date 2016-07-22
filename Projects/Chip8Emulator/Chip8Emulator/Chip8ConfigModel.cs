@@ -28,10 +28,8 @@ namespace Chip8Emulator
         public int ScreenWidth { get; set; }
         //Stores the height of the screen.
         public int ScreenHeight { get; set; }
-        //Stores the keys that have been pressed.
-        public bool[] KeyPresses { get; set; }
-        //Bool that for key press.
-        public bool KeyPressed { get; set; }
+        //Keeps track of all of the keyboard events.
+        public KeyboardValuesModel KeyModel { get; set; }
         //Stores the rom.
         public int[] Rom { get; set; }
     }

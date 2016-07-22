@@ -24,8 +24,6 @@ namespace Chip8Emulator
         {
             config.PC = config.Stack[config.SP];
             config.SP--;
-
-            config.PC -= 2;
         }
 
         public static void JumpToAddress(Chip8ConfigModel config, int instruction)
@@ -248,6 +246,7 @@ namespace Chip8Emulator
             var vY = config.V[y];
 
             var counter = 0;
+            var collision = false;
             for (int i = I; i < I + n; i++)
             {
                 for (int j = 1; j <= 8; j++)
@@ -267,11 +266,19 @@ namespace Chip8Emulator
 
                     if (before == 1 && config.Pixels[place,vY + counter] == 0)
                     {
-                        config.V[0xF] = 1;
+                        collision = true;
                     }
                 }
 
                 counter++;
+            }
+            if (collision)
+            {
+                config.V[0xF] = 1;
+            }
+            else
+            {
+                config.V[0xF] = 0;
             }
         }
 
@@ -283,8 +290,9 @@ namespace Chip8Emulator
         public static void SkipNextInstructionKeyPressed(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
+            var vX = config.V[x];
 
-            if (config.KeyPresses[x])
+            if (config.KeyModel.KeyPresses[vX - 1])
             {
                 config.PC += 2; 
             }
@@ -293,8 +301,9 @@ namespace Chip8Emulator
         public static void SkipNextInstructionKeyNotPressed(Chip8ConfigModel config, int instruction)
         {
             var x = (instruction & 0x0F00) >> 8;
+            var vX = config.V[x];
 
-            if (!config.KeyPresses[x]) 
+            if (!config.KeyModel.KeyPresses[vX - 1]) 
             {
                 config.PC += 2;
             }
@@ -311,11 +320,11 @@ namespace Chip8Emulator
             var x = (instruction & 0x0F00) >> 8;
 
             var key = 0;
-            if (config.KeyPressed)
+            if (config.KeyModel.KeyPressed)
             {
                 for (int i = 0; i < 0xF; i++)
                 {
-                    if (config.KeyPresses[i])
+                    if (config.KeyModel.KeyPresses[i])
                     {
                         key = i;
                         break;
@@ -376,7 +385,7 @@ namespace Chip8Emulator
             var rom = config.Rom;
             var I = config.I; 
 
-            for (int i = 0; i <= 0xF; i++)
+            for (int i = 0; i <= x; i++)
             {
                 rom[I + i] = (int)config.V[i];
             }
@@ -388,6 +397,7 @@ namespace Chip8Emulator
             var rom = config.Rom;
             var I = config.I; 
             
+            //<=vX
             for (int i = 0; i <= x; i++)
             {
                 config.V[i] = (byte)rom[I + i];

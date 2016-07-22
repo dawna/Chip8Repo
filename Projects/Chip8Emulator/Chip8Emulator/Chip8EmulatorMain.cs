@@ -57,21 +57,26 @@ namespace Chip8Emulator
 
         static void Main(string[] args)
         {
-            string filePath = @"C:\Users\AdamD\Source\Repos\Chip8Repo\Projects\Chip8Emulator\Chip8Emulator\Chip-8 Pack\Chip-8 Games\Breakout (Brix hack) [David Winter, 1997].ch8";
+            string filePath = @"C:\Users\AdamD\Source\Repos\Chip8Repo\Projects\Chip8Emulator\Chip8Emulator\Chip-8 Pack\Chip-8 Games\Brix [Andreas Gustafsson, 1990].ch8";
 
             //Retrieves ROM and stores it.
             int[] rom = ReadRomFromFile(filePath);
             LoadSpritesIntoRom(rom);
             
             Renderer renderer = new Renderer();
+            KeyboardConfigurations keyConfig = new KeyboardConfigurations();
 
-            Chip8Interpreter interpreter = new Chip8Interpreter(rom, ROMType.Normal, renderer);
+            Chip8Interpreter interpreter = new Chip8Interpreter(rom, ROMType.Normal, renderer, keyConfig);
             RenderWindow window = new RenderWindow(new VideoMode(800,600), "TEST WINDOW");
 
             Color windowColor = Color.Black;
 
             window.Closed += new EventHandler(OnClose);
             window.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPress);
+            window.KeyPressed += new EventHandler<KeyEventArgs>(keyConfig.KeyPressedEvent);
+            window.KeyReleased += new EventHandler<KeyEventArgs>(keyConfig.KeyReleasedEvent);
+
+            window.SetFramerateLimit(60);
 
             while (window.IsOpen())
             {
